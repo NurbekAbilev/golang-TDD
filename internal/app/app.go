@@ -1,12 +1,12 @@
 package app
 
 import (
-	"database/sql"
 	"log"
 	"net/http"
 
 	"github.com/nurbekabilev/golang-tdd/internal/app/conns"
 	"github.com/nurbekabilev/golang-tdd/internal/app/repository"
+	"github.com/nurbekabilev/golang-tdd/internal/migrate"
 	"github.com/nurbekabilev/golang-tdd/internal/routes"
 )
 
@@ -16,7 +16,7 @@ func Run() error {
 		log.Fatal(err)
 	}
 
-	err = initdb(db)
+	err = migrate.Migrate(db)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -30,22 +30,6 @@ func Run() error {
 	port := ":8080"
 	log.Printf("listening http port %s\n", port)
 	err = http.ListenAndServe(port, nil)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func initdb(db *sql.DB) error {
-	_, err := db.Exec(`
-		CREATE TABLE IF NOT EXISTS tasks (
-			id UUID PRIMARY KEY,
-			title TEXT NOT NULL,
-			description TEXT,
-			completed_at TIMESTAMP
-		)
-	`)
 	if err != nil {
 		return err
 	}

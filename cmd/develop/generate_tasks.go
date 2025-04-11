@@ -1,6 +1,7 @@
-package develop
+package main
 
 import (
+	"log"
 	"time"
 
 	"github.com/google/uuid"
@@ -36,12 +37,12 @@ func main() {
 	}
 
 	for _, task := range tasks {
+		log.Printf("running seed for %s\n", task.Title)
 		_, err := db.Exec(
 			"INSERT INTO tasks (id, title, description, completed_at) VALUES (?, ?, ?, ?)",
 			task.ID, task.Title, task.Description, task.CompletedAt)
 		if err != nil {
-			panic(err)
+			log.Printf("error occured for task %+v %w\n", task, err)
 		}
-		// db.Exec("insert into tasks(id, title, description, values) values ($1, %2)")
 	}
 }
