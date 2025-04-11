@@ -3,13 +3,15 @@ package repository
 import (
 	"context"
 	"database/sql"
+	"fmt"
+	"log"
 
 	"github.com/nurbekabilev/golang-tdd/internal/data/task"
 )
 
 type TaskRepository interface {
 	CreateTask(ctx context.Context, task task.Task) error
-	GetTask(ctx context.Context) ([]task.Task, error)
+	GetTasks(ctx context.Context) ([]task.Task, error)
 }
 
 type TasksCreateRepository interface {
@@ -17,7 +19,7 @@ type TasksCreateRepository interface {
 }
 
 type TasksGetRepository interface {
-	GetTask(ctx context.Context) ([]task.Task, error)
+	GetTasks(ctx context.Context) ([]task.Task, error)
 }
 
 var TasksRepo TaskRepository = nil
@@ -37,6 +39,30 @@ func (r *repo) CreateTask(ctx context.Context, task task.Task) error {
 	return nil
 }
 
-func (r *repo) GetTask(ctx context.Context) ([]task.Task, error) {
-	panic("unimplemented")
+func (r *repo) GetTasks(ctx context.Context) ([]task.Task, error) {
+	res := make([]task.Task, 0)
+
+	rows, err := r.db.QueryContext(ctx, "select id, title, description, completed_at from tasks limit 10")
+	if err != nil {
+		return nil, fmt.Errorf("get tasks error: %w", err)
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		var t task.Task
+		if err := rows.Scan(&t.ID, &t.Title, &t.Description, &t.CompletedAt); err != nil {
+			return nil, fmt.Errorf("error scanning row: %w", err)
+		}
+		res = append(res, t)
+	}
+
+	// todo log
+	log.Printf("rows.next : %+v\n", res)
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("rows iteration error: %w", err)
+	}
+
+	return res, nil
 }

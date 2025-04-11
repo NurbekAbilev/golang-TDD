@@ -2,11 +2,10 @@ package routes
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
-	"time"
 
-	"github.com/google/uuid"
-	"github.com/nurbekabilev/golang-tdd/internal/data/task"
+	"github.com/nurbekabilev/golang-tdd/internal/app/repository"
 )
 
 func handleCreateTask(w http.ResponseWriter, r *http.Request) {
@@ -14,18 +13,14 @@ func handleCreateTask(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleListTasks(w http.ResponseWriter, r *http.Request) {
-	taskID := uuid.New()
-	resposne := []task.Task{
-		{
-			ID:          taskID,
-			Title:       "Task title",
-			Description: "Title description",
-			CompletedAt: time.Time{},
-		},
+	tasks, err := repository.TasksRepo.GetTasks(r.Context())
+	if err != nil {
+		log.Printf("error occured in handleListTasks: %s", err)
+		http.Error(w, "error occured", http.StatusInternalServerError)
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	err := json.NewEncoder(w).Encode(resposne)
+	err = json.NewEncoder(w).Encode(tasks)
 	if err != nil {
 		http.Error(w, "could not encode response", http.StatusInternalServerError)
 	}

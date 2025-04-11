@@ -17,22 +17,22 @@ func main() {
 
 	tasks := []task.Task{
 		{
-			ID:          uuid.New(),
+			ID:          uuid.New().String(),
 			Title:       "title 1",
 			Description: "description 1",
-			CompletedAt: time.Now(),
+			CompletedAt: time.Now().Format(time.RFC3339),
 		},
 		{
-			ID:          uuid.New(),
+			ID:          uuid.New().String(),
 			Title:       "title 2",
 			Description: "description 2",
-			CompletedAt: time.Time{},
+			CompletedAt: "",
 		},
 		{
-			ID:          uuid.New(),
+			ID:          uuid.New().String(),
 			Title:       "title 3",
 			Description: "description 3",
-			CompletedAt: time.Time{},
+			CompletedAt: "",
 		},
 	}
 
