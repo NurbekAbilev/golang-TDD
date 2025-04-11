@@ -1,23 +1,54 @@
 package app
 
 import (
+	"database/sql"
 	"log"
 	"net/http"
+
+	"github.com/nurbekabilev/golang-tdd/internal/app/conns"
+	"github.com/nurbekabilev/golang-tdd/internal/app/repository"
+	"github.com/nurbekabilev/golang-tdd/internal/routes"
 )
 
 func Run() error {
-	http.HandleFunc("POST /tasks", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("Hello, World!"))
-	})
+	db, err := conns.InitSQLiteConn()
+	if err != nil {
+		log.Fatal(err)
+	}
 
-	http.HandleFunc("GET /tasks", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("Goodbye, World!"))
-	})
+	err = initdb(db)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	repository.TasksRepo = repository.NewTaskRepo(db)
+
+	tasksRouter := routes.NewTasksRouter()
+
+	http.Handle("/", tasksRouter)
 
 	port := ":8080"
 	log.Printf("listening http port %s\n", port)
-	err := http.ListenAndServe(port, nil)
+	err = http.ListenAndServe(port, nil)
 	if err != nil {
 		return err
 	}
+
+	return nil
+}
+
+func initdb(db *sql.DB) error {
+	_, err := db.Exec(`
+		CREATE TABLE IF NOT EXISTS tasks (
+			id UUID PRIMARY KEY,
+			title TEXT NOT NULL,
+			description TEXT,
+			completed_at TIMESTAMP
+		)
+	`)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

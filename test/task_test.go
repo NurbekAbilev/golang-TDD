@@ -4,22 +4,21 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/nurbekabilev/golang-tdd/internal/routes"
+	"github.com/stretchr/testify/assert"
 )
 
-func testCreateTask(t *testing.T) {
-	req, err := http.NewRequest("POST", "/tasks", nil)
-	if err != nil {
-		t.Fatalf("Could not create request: %v", err)
-	}
+func TestListTasks(t *testing.T) {
+	req, err := http.NewRequest("GET", "/tasks", nil)
+	assert.NoError(t, err)
 
 	rr := httptest.NewRecorder()
-	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusCreated)
-	})
 
-	handler.ServeHTTP(rr, req)
+	mux := routes.NewTasksRouter()
+	mux.ServeHTTP(rr, req)
 
-	if status := rr.Code; status != http.StatusCreated {
-		t.Errorf("Handler returned wrong status code: got %v want %v", status, http.StatusCreated)
-	}
+	response := rr.Result()
+
+	assert.Equal(t, response.StatusCode, http.StatusOK)
 }

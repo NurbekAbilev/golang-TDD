@@ -1,4 +1,4 @@
-package repository
+package task
 
 import (
 	"time"
@@ -6,9 +6,9 @@ import (
 	"github.com/google/uuid"
 )
 
-type Data struct {
+type Task struct {
 	ID          uuid.UUID `json:"id"`
 	Title       string    `json:"title"`
 	Description string    `json:"description"`
-	CompletedAt time.Time `json:"completed"`
+	CompletedAt time.Time `json:"completed_at"`
 }
