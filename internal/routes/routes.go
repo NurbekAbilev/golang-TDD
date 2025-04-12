@@ -6,10 +6,36 @@ import (
 	"net/http"
 
 	"github.com/nurbekabilev/golang-tdd/internal/app/repository"
+	"github.com/nurbekabilev/golang-tdd/internal/data/task"
 )
 
 func handleCreateTask(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Hello, World!"))
+	w.Header().Set("Content-Type", "application-json")
+
+	response := task.CreateTaskResponse{
+		Status: http.StatusOK,
+	}
+
+	requestTask := task.Task{}
+	err := json.NewDecoder(r.Body).Decode(&requestTask)
+	if err != nil {
+		http.Error(w, "internal server error", http.StatusInternalServerError)
+		return
+	}
+
+	err = repository.TasksRepo.CreateTask(r.Context(), requestTask)
+	if err != nil {
+		http.Error(w, "internal server error", http.StatusInternalServerError)
+		return
+	}
+
+	json, err := json.Marshal(response)
+	if err != nil {
+		http.Error(w, "internal server error", http.StatusInternalServerError)
+		return
+	}
+
+	w.Write(json)
 }
 
 func handleListTasks(w http.ResponseWriter, r *http.Request) {

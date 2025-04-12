@@ -35,7 +35,13 @@ func NewTaskRepo(db *sql.DB) TaskRepository {
 }
 
 func (r *repo) CreateTask(ctx context.Context, task task.Task) error {
-	// r.db.Exec("insert into values")
+	_, err := r.db.Exec("insert into tasks (id, title, description, completed_at) values (?,?,?,?)",
+		task.ID, task.Title, task.Description, task.CompletedAt)
+
+	if err != nil {
+		return fmt.Errorf("repo create task error: %w", err)
+	}
+
 	return nil
 }
 

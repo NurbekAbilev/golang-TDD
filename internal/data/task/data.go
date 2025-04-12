@@ -6,3 +6,7 @@ type Task struct {
 	Description string `json:"description"`
 	CompletedAt string `json:"completed_at"`
 }
+
+type CreateTaskResponse struct {
+	Status int `json:"status"`
+}

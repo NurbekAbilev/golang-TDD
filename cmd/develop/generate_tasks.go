@@ -42,7 +42,7 @@ func main() {
 			"INSERT INTO tasks (id, title, description, completed_at) VALUES (?, ?, ?, ?)",
 			task.ID, task.Title, task.Description, task.CompletedAt)
 		if err != nil {
-			log.Printf("error occured for task %+v %w\n", task, err)
+			log.Printf("error occured for task %+v %v\n", task, err)
 		}
 	}
 }
